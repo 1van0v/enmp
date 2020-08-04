@@ -1,5 +1,5 @@
-const csv2json = require('csvtojson');
-const fs = require('fs');
+import csv2json from 'csvtojson';
+import fs from 'fs';
 
 const csvPath = './csv';
 
@@ -11,10 +11,14 @@ function parseCSV(files) {
     return console.error('put csv file into ./csv folder');
   }
 
-  const readStream = fs.createReadStream(`${csvPath}/${files[0]}`);
-  const writeStream = fs.createWriteStream('./json_data.txt');
+  const sourceFile = `${csvPath}/${files[0]}`;
+  const destFile = './json_data.txt';
+
+  const readStream = fs.createReadStream(sourceFile);
+  const writeStream = fs.createWriteStream(destFile);
   readStream
     .pipe(csv2json())
     .pipe(writeStream)
+    .on('finish', () => console.log(`${sourceFile} CSV has been transformed to ${destFile}`))
     .on('error', error => console.log('Something incredible wrong has happened', error));
 }
