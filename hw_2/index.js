@@ -2,6 +2,7 @@ import express from 'express';
 import { v4 as uuid } from 'uuid';
 
 import logger from './utils/logger';
+import { getAutoSuggestUsers } from './utils/getAutoSuggestUsers';
 import { users } from './users';
 
 const port = 3000;
@@ -12,6 +13,14 @@ app.use(express.json());
 app.use(logger);
 
 app.get('/users', (req, res) => {
+    const { loginSubstring, limit } = req.query;
+
+    if (loginSubstring && limit) {
+        return res.json({
+            users: getAutoSuggestUsers(users, loginSubstring, limit)
+        });
+    }
+
     return res.json({ users });
 });
 
