@@ -1,4 +1,7 @@
 export default function logger(req, res, next) {
-    console.log(res.statusCode, req.method, req.path, req.body);
+    const body = Object.keys(req.body).length ? req.body : '';
+
+    console.log(res.statusCode, req.method, req.path, body);
+
     next();
 }

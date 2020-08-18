@@ -25,7 +25,6 @@ app.get('/users/:id', (req, res) => {
 });
 
 app.post('/users', (req, res) => {
-    console.log('received a new user');
     const { login, password, age } = req.body;
 
     if (!(login && password && age)) {
@@ -42,6 +41,23 @@ app.post('/users', (req, res) => {
 
     users.push(newUser);
     res.json(newUser);
+});
+
+app.put('/users/:id', (req, res) => {
+    const userToUpdate = users.find((i) => i.id === req.params.id);
+
+    if (!userToUpdate) {
+        return res.status(400).json({ error: 'Cannot find such user' });
+    }
+
+    ['login', 'password', 'age'].forEach((key) => {
+        const update = req.body[key];
+        if (update) {
+            userToUpdate[key] = update;
+        }
+    });
+
+    res.json(userToUpdate);
 });
 
 app.listen(port, () => {
