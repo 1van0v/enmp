@@ -60,6 +60,18 @@ app.put('/users/:id', (req, res) => {
     res.json(userToUpdate);
 });
 
+app.delete('/users/:id', (req, res) => {
+    const userToUpdate = users.find((i) => i.id === req.params.id);
+
+    if (!userToUpdate) {
+        return res.status(404).json({ error: 'cannot find such user' });
+    }
+
+    userToUpdate.isDeleted = true;
+
+    res.status(200).json(userToUpdate);
+});
+
 app.listen(port, () => {
     console.log('server is running on port', port);
 });
