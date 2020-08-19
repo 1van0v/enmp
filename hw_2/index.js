@@ -5,6 +5,7 @@ import { createValidator } from 'express-joi-validation';
 
 import logger from './utils/logger';
 import { getAutoSuggestUsers } from './utils/getAutoSuggestUsers';
+import { findUserById } from './utils/findUserById';
 import { users } from './users';
 
 const port = 3000;
@@ -41,12 +42,9 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/users/:id', (req, res) => {
-    const { id } = req.params;
-    const user = users.find((i) => i.id === id);
+    const user = findUserById(users, req.params.id);
 
-    return user
-        ? res.json(user)
-        : res.status(404).json({ error: `Cannot find a user with ID ${id}` });
+    return res.json(user);
 });
 
 app.post('/users', validator.body(addUserSchema), (req, res) => {
@@ -66,14 +64,10 @@ app.post('/users', validator.body(addUserSchema), (req, res) => {
 
 app.put('/users/:id', validator.body(updateUserSchema), (req, res) => {
     if (!Object.keys(req.body).length) {
-        return res.status(400).json({ error: 'specify update values' });
+        throw new Error('specify update values');
     }
 
-    const userToUpdate = users.find((i) => i.id === req.params.id);
-
-    if (!userToUpdate) {
-        return res.status(400).json({ error: 'Cannot find such user' });
-    }
+    const userToUpdate = findUserById(users, req.params.id);
 
     ['login', 'password', 'age', 'isDeleted'].forEach((key) => {
         const update = req.body[key];
@@ -86,11 +80,7 @@ app.put('/users/:id', validator.body(updateUserSchema), (req, res) => {
 });
 
 app.delete('/users/:id', (req, res) => {
-    const userToUpdate = users.find((i) => i.id === req.params.id);
-
-    if (!userToUpdate) {
-        return res.status(404).json({ error: 'cannot find such user' });
-    }
+    const userToUpdate = findUserById(users, req.params.id);
 
     userToUpdate.isDeleted = true;
 
@@ -98,13 +88,18 @@ app.delete('/users/:id', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
+    let error;
+
     if (err && err.error && err.error.isJoi) {
-        return res.status(400).json({
-            message: err.error.toString()
-        });
+        error = err.error.toString();
+    } else if (!err.message) {
+        error = 'Something terrible wrong happened';
+    } else {
+        error = err.message;
     }
 
-    return next(err);
+    res.status(400).json({ error });
+    next();
 });
 
 app.listen(port, () => {
