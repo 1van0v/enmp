@@ -1,12 +1,10 @@
 import express from 'express';
-import { v4 as uuid } from 'uuid';
 import Joi from '@hapi/joi';
 import { createValidator } from 'express-joi-validation';
+import { Op } from 'sequelize';
 
 import logger from './utils/logger';
-import { getAutoSuggestUsers } from './utils/getAutoSuggestUsers';
-import { findUserById } from './utils/findUserById';
-import { users } from './users';
+import { Users } from './models/users';
 
 const port = 3000;
 
@@ -29,62 +27,83 @@ const updateUserSchema = Joi.object({
 app.use(express.json());
 app.use(logger);
 
-app.get('/users', (req, res) => {
+app.get('/users', async (req, res) => {
     const { loginSubstring, limit } = req.query;
+    let findOptions;
 
     if (loginSubstring && limit) {
-        return res.json({
-            users: getAutoSuggestUsers(users, loginSubstring, limit)
-        });
+        findOptions = {
+            where: {
+                login: {
+                    [Op.substring]: loginSubstring
+                }
+            },
+            order: [['login', 'ASC']],
+            limit
+        };
     }
+
+    const users = await Users.findAll(findOptions);
 
     return res.json({ users });
 });
 
-app.get('/users/:id', (req, res) => {
-    const user = findUserById(users, req.params.id);
+app.get('/users/:id', async (req, res, next) => {
+    const { id } = req.params;
+
+    const user = await Users.findByPk(id);
+
+    if (!user) {
+        return next(new Error(`no users with id=${id}`));
+    }
 
     return res.json(user);
 });
 
-app.post('/users', validator.body(addUserSchema), (req, res) => {
+app.post('/users', validator.body(addUserSchema), async (req, res, next) => {
     const { login, password, age } = req.body;
 
-    const newUser = {
-        id: uuid(),
-        login,
-        password,
-        age,
-        isDeleted: false
-    };
-
-    users.push(newUser);
-    res.json(newUser);
-});
-
-app.put('/users/:id', validator.body(updateUserSchema), (req, res) => {
-    if (!Object.keys(req.body).length) {
-        throw new Error('specify update values');
+    try {
+        const user = await Users.create({ login, password, age });
+        res.json(user);
+    } catch (e) {
+        return next(e);
     }
-
-    const userToUpdate = findUserById(users, req.params.id);
-
-    ['login', 'password', 'age', 'isDeleted'].forEach((key) => {
-        const update = req.body[key];
-        if (update) {
-            userToUpdate[key] = update;
-        }
-    });
-
-    res.json(userToUpdate);
 });
 
-app.delete('/users/:id', (req, res) => {
-    const userToUpdate = findUserById(users, req.params.id);
+app.put(
+    '/users/:id',
+    validator.body(updateUserSchema),
+    async (req, res, next) => {
+        if (!Object.keys(req.body).length) {
+            return next(new Error('specify update values'));
+        }
 
-    userToUpdate.isDeleted = true;
+        try {
+            const updated = await Users.update(req.body, {
+                where: { id: req.params.id }
+            }).then(() => Users.findByPk(req.params.id));
 
-    res.status(200).json(userToUpdate);
+            res.json(updated);
+        } catch (e) {
+            return next(e);
+        }
+    }
+);
+
+app.delete('/users/:id', async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const deleted = await Users.update(
+            { isDeleted: true },
+            { where: { id } }
+        ).then(() => Users.findByPk(id));
+
+        res.status(200).json(deleted);
+    } catch (e) {
+        return next(e);
+    }
 });
 
 app.use((err, req, res, next) => {
