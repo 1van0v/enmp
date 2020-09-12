@@ -22,7 +22,7 @@ pg.connect();
             "isDeleted" BOOLEAN NOT NULL DEFAULT false,
             PRIMARY KEY (id)
         )`);
-        console.log('table is created');
+        console.log('users table is created');
 
         for (const user of users) {
             const result = await pg.query(
@@ -32,6 +32,19 @@ pg.connect();
             const { id, login, password, age, isDeleted } = result.rows[0];
             console.log('inserted', id, login, password, age, isDeleted);
         }
+
+        await pg.query('CREATE TYPE permissions AS ENUM (\'READ\', \'WRITE\', \'DELETE\', \'SHARE\', \'UPLOAD_FILES\');');
+        await pg.query(`CREATE TABLE groups (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4 (),
+            name VARCHAR NOT NULL,
+            permissions permissions[] not NULL
+        )`);
+        console.log('groups table is created');
+
+        await pg.query(`INSERT INTO groups (name, permissions) VALUES
+            ('reader', '{ READ, SHARE }'),
+            ('writer', '{ WRITE, DELETE, UPLOAD_FILES }');
+        `);
     } catch (e) {
         console.log('something went wrong', e);
     }
