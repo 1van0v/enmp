@@ -1,10 +1,11 @@
-import { Users } from '../models/users';
+import { Users } from '../models';
 import { Op } from 'sequelize';
 
 export class UsersService {
     constructor(users) {
         this.users = users;
     }
+
     getUser(id) {
         return this.users.findByPk(id);
     }

@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { createValidator } from 'express-joi-validation';
 
-import { usersService } from '../services/users.service';
-import { addUserSchema, updateUserSchema } from '../utils/validators';
+import { usersService } from '../services';
+import { validator } from '../configs/validator';
+import { addUserSchema, updateUserSchema, isBodyEmpty } from '../utils/validators';
 
 const usersRouter = Router();
-const validator = createValidator({ passError: true });
 
 usersRouter.get('/', (req, res, next) => {
     const { loginSubstring, limit } = req.query;
@@ -45,11 +44,8 @@ usersRouter.put(
     '/:id',
     validator.body(updateUserSchema),
     async (req, res, next) => {
-        if (!Object.keys(req.body).length) {
-            return next(new Error('specify update values'));
-        }
-
         try {
+            isBodyEmpty(req.body);
             const updated = await usersService.updateUser(
                 req.params.id,
                 req.body
