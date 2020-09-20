@@ -45,6 +45,17 @@ pg.connect();
             ('reader', '{ READ, SHARE }'),
             ('writer', '{ WRITE, DELETE, UPLOAD_FILES }');
         `);
+        await pg.query('DROP TABLE IF EXISTS "UserGroup";');
+        await pg.query(`CREATE TABLE "UserGroup" (
+            user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+            group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
+            PRIMARY KEY (user_id, group_id)
+        );`);
+        console.log('UserGroup table is created');
+        await pg.query(`INSERT INTO "UserGroup" (user_id, group_id) VALUES (
+            (SELECT id from users where "isDeleted" = false LIMIT 1),
+            (SELECT id FROM groups LIMIT 1)
+        );`);
     } catch (e) {
         console.log('something went wrong', e);
     }
