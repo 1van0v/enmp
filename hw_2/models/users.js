@@ -1,8 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 
-import { sequelize } from '../configs/database';
-
-const Users = sequelize.define(
+export const UsersModel = sequelize => sequelize.define(
     'Users',
     {
         id: {
@@ -30,7 +28,3 @@ const Users = sequelize.define(
     },
     { tableName: 'users', timestamps: false }
 );
-
-Users.sync();
-
-export { Users };

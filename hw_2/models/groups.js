@@ -1,8 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 
-import { sequelize } from '../configs/database';
-
-const Groups = sequelize.define(
+export const GroupsModel = sequelize => sequelize.define(
     'Groups',
     {
         id: {
@@ -21,7 +19,3 @@ const Groups = sequelize.define(
     },
     { tableName: 'groups', timestamps: false }
 );
-
-Groups.sync();
-
-export { Groups };
