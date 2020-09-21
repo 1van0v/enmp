@@ -1,12 +1,6 @@
-import 'dotenv/config.js';
 import { Sequelize, DataTypes } from 'sequelize';
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    dialectOptions: { ssl: { rejectUnauthorized: false } }
-});
-
-const Users = sequelize.define(
+export const UsersModel = sequelize => sequelize.define(
     'Users',
     {
         id: {
@@ -34,7 +28,3 @@ const Users = sequelize.define(
     },
     { tableName: 'users', timestamps: false }
 );
-
-Users.sync();
-
-export { Users };

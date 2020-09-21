@@ -1,16 +1,28 @@
-import { Users } from '../models/users';
+import { Users, Groups, UserGroup } from '../models';
 import { Op } from 'sequelize';
 
 export class UsersService {
+    get queryConfig() {
+        return {
+            include: [
+                {
+                    model: Groups,
+                    as: 'groups'
+                }
+            ]
+        };
+    }
+
     constructor(users) {
         this.users = users;
     }
+
     getUser(id) {
-        return this.users.findByPk(id);
+        return this.users.findByPk(id, this.queryConfig);
     }
 
     getUsers() {
-        return this.users.findAll();
+        return this.users.findAll(this.queryConfig);
     }
 
     getSuggestions(str, limit) {
@@ -21,7 +33,8 @@ export class UsersService {
                 }
             },
             order: [['login', 'ASC']],
-            limit
+            limit,
+            ...this.queryConfig
         });
     }
 
