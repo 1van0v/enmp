@@ -65,8 +65,7 @@ groupsRouter.delete('/:id', async (req, res, next) => {
 
 groupsRouter.post('/:id/users', async (req, res, next) => {
     try {
-        const result = await groupsService.addUsersToGroup(req.params.id, req.body.userIds);
-        console.log(result);
+        await groupsService.addUsersToGroup(req.params.id, req.body.userIds);
         res.status(200).end();
     } catch (e) {
         return next(e);
