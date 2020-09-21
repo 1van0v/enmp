@@ -45,7 +45,7 @@ pg.connect();
             ('reader', '{ READ, SHARE }'),
             ('writer', '{ WRITE, DELETE, UPLOAD_FILES }');
         `);
-        await pg.query('DROP TABLE IF EXISTS "UserGroup";');
+
         await pg.query(`CREATE TABLE "UserGroup" (
             user_id UUID REFERENCES users(id) ON DELETE CASCADE,
             group_id UUID REFERENCES groups(id) ON DELETE CASCADE,

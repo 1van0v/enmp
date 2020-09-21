@@ -6,6 +6,7 @@ export function UserGroupModel(sequelize, Users, Groups) {
         {
             user_id: {
                 type: DataTypes.UUID,
+                primaryKey: true,
                 references: {
                     model: Users,
                     key: 'id'
@@ -13,6 +14,7 @@ export function UserGroupModel(sequelize, Users, Groups) {
             },
             group_id: {
                 type: DataTypes.UUID,
+                primaryKey: true,
                 references: {
                     model: Groups,
                     key: 'id'
