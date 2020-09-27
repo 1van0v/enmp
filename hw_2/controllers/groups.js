@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { groupsService } from '../services';
 import { validator } from '../configs/validator';
-import { updateGroupSchema, isBodyEmpty, addGroupSchema } from '../utils/validators';
+import { updateGroupSchema, isBodyEmpty, addGroupSchema, addUsersToGroupSchema } from '../utils/validators';
 
 const groupsRouter = Router();
 
@@ -63,7 +63,7 @@ groupsRouter.delete('/:id', async (req, res, next) => {
     }
 });
 
-groupsRouter.post('/:id/users', async (req, res, next) => {
+groupsRouter.post('/:id/users', validator.body(addUsersToGroupSchema), async (req, res, next) => {
     try {
         await groupsService.addUsersToGroup(req.params.id, req.body.userIds);
         res.status(200).end();

@@ -23,6 +23,10 @@ export const updateGroupSchema = Joi.object({
     permissions: Joi.array().items(Joi.string().valid('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES'))
 });
 
+export const addUsersToGroupSchema = Joi.object({
+    userIds: Joi.array().min(1).required()
+});
+
 export function isBodyEmpty(body) {
     if (!Object.keys(body).length) {
         throw new Error('specify update values');

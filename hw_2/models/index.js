@@ -10,8 +10,8 @@ export const sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialectOptions: { ssl: { rejectUnauthorized: false } }
 });
 
-const Users = UsersModel(sequelize);
 const Groups = GroupsModel(sequelize);
+const Users = UsersModel(sequelize, Groups);
 const UserGroup = UserGroupModel(sequelize, Users, Groups);
 
 Users.belongsToMany(Groups, { through: UserGroup, foreignKey: 'user_id', as: 'groups' });

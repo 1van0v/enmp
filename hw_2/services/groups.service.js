@@ -1,7 +1,5 @@
 import { Groups, UserGroup } from '../models';
 
-import { sequelize } from '../models';
-
 export class GroupsService {
     constructor(groups, userGroup) {
         this.groups = groups;
@@ -9,11 +7,11 @@ export class GroupsService {
     }
 
     getGroup(id) {
-        return this.groups.findByPk(id);
+        return this.groups.getGroup(id);
     }
 
     getGroups() {
-        return this.groups.findAll();
+        return this.groups.getGroups();
     }
 
     addGroup(group) {
@@ -21,31 +19,16 @@ export class GroupsService {
     }
 
     async updateGroup(id, update) {
-        await this.groups.update(update, { where: { id } });
+        await this.groups.updateGroup(id, update);
         return this.getGroup(id);
     }
 
     deleteGroup(id) {
-        return this.groups.destroy({ where: { id } });
+        return this.groups.deleteGroup(id);
     }
 
-    async addUsersToGroup(groupId, userIds) {
-        const transaction = await sequelize.transaction();
-
-        try {
-            const updates = userIds.map(userId => this.userGroup.create(
-                {
-                    user_id: userId,
-                    group_id: groupId
-                },
-                { transaction }
-            ));
-
-            await Promise.all(updates);
-            await transaction.commit();
-        } catch (e) {
-            await transaction.rollback();
-        }
+    addUsersToGroup(groupId, userIds) {
+        return this.groups.addUsersToGroup(groupId, userIds);
     }
 }
 

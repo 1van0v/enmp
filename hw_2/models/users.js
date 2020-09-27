@@ -1,30 +1,61 @@
 import { Sequelize, DataTypes } from 'sequelize';
+import { Op } from 'sequelize';
 
-export const UsersModel = sequelize => sequelize.define(
-    'Users',
-    {
-        id: {
-            type: DataTypes.UUID,
-            primaryKey: true,
-            defaultValue: Sequelize.UUIDV4
+export function UsersModel (sequelize, groupsModel) {
+    const queryConfig = {
+        include: [
+            {
+                model: groupsModel,
+                as: 'groups'
+            }
+        ]
+    };
+
+    const model = sequelize.define(
+        'Users',
+        {
+            id: {
+                type: DataTypes.UUID,
+                primaryKey: true,
+                defaultValue: Sequelize.UUIDV4
+            },
+            login: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            password: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            age: {
+                type: DataTypes.NUMERIC,
+                allowNull: false
+            },
+            isDeleted: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            }
         },
-        login: {
-            type: DataTypes.STRING,
-            allowNull: false
+        { tableName: 'users', timestamps: false }
+    );
+
+
+    model.getUser = id => model.findByPk(id, queryConfig);
+    model.getUsers = () => model.findAll(queryConfig);
+    model.updateUser = (id, update) => model.update(update, { where: { id } });
+    model.deleteUser = id => model.updateUser(id, { isDeleted: true });
+
+    model.getSuggestions = (str, limit) => model.findAll({
+        where: {
+            login: {
+                [Op.substring]: str
+            }
         },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        age: {
-            type: DataTypes.NUMERIC,
-            allowNull: false
-        },
-        isDeleted: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        }
-    },
-    { tableName: 'users', timestamps: false }
-);
+        order: [['login', 'ASC']],
+        limit,
+        ...queryConfig
+    });
+
+    return model;
+}

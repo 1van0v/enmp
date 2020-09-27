@@ -1,41 +1,20 @@
-import { Users, Groups, UserGroup } from '../models';
-import { Op } from 'sequelize';
+import { Users } from '../models';
 
 export class UsersService {
-    get queryConfig() {
-        return {
-            include: [
-                {
-                    model: Groups,
-                    as: 'groups'
-                }
-            ]
-        };
-    }
-
     constructor(users) {
         this.users = users;
     }
 
     getUser(id) {
-        return this.users.findByPk(id, this.queryConfig);
+        return this.users.getUser(id, this.queryConfig);
     }
 
     getUsers() {
-        return this.users.findAll(this.queryConfig);
+        return this.users.getUsers();
     }
 
     getSuggestions(str, limit) {
-        return this.users.findAll({
-            where: {
-                login: {
-                    [Op.substring]: str
-                }
-            },
-            order: [['login', 'ASC']],
-            limit,
-            ...this.queryConfig
-        });
+        return this.users.getSuggestions(str, limit);
     }
 
     addUser(user) {
@@ -43,12 +22,12 @@ export class UsersService {
     }
 
     async updateUser(id, update) {
-        await this.users.update(update, { where: { id } });
+        await this.users.updateUser(id, update);
         return this.getUser(id);
     }
 
     async deleteUser(id) {
-        return this.updateUser(id, { isDeleted: true });
+        return this.deleteUser(id);
     }
 }
 
