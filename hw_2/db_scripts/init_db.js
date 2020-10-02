@@ -33,7 +33,9 @@ pg.connect();
             console.log('inserted', id, login, password, age, isDeleted);
         }
 
-        await pg.query('CREATE TYPE permissions AS ENUM (\'READ\', \'WRITE\', \'DELETE\', \'SHARE\', \'UPLOAD_FILES\');');
+        await pg.query(
+            "CREATE TYPE permissions AS ENUM ('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES');"
+        );
         await pg.query(`CREATE TABLE groups (
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4 (),
             name VARCHAR NOT NULL,

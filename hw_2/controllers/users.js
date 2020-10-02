@@ -2,7 +2,11 @@ import { Router } from 'express';
 
 import { usersService } from '../services';
 import { validator } from '../configs/validator';
-import { addUserSchema, updateUserSchema, isBodyEmpty } from '../utils/validators';
+import {
+    addUserSchema,
+    updateUserSchema,
+    isBodyEmpty
+} from '../utils/validators';
 
 const usersRouter = Router();
 
