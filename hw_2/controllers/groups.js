@@ -15,7 +15,10 @@ groupsRouter.get('/', (req, res, next) => {
     console.log('processing get request');
     groupsService
         .getGroups()
-        .then((users) => res.json(users))
+        .then((users) => {
+            res.json(users);
+            next();
+        })
         .catch(next);
 });
 
@@ -29,6 +32,7 @@ groupsRouter.get('/:id', async (req, res, next) => {
         }
 
         res.json(group);
+        return next();
     } catch (e) {
         return next(e);
     }
@@ -41,6 +45,7 @@ groupsRouter.post(
         try {
             const user = await groupsService.addGroup(req.body);
             res.json(user);
+            return next();
         } catch (e) {
             return next(e);
         }
@@ -58,6 +63,7 @@ groupsRouter.put(
                 req.body
             );
             res.json(updated);
+            return next();
         } catch (e) {
             return next(e);
         }
@@ -68,6 +74,7 @@ groupsRouter.delete('/:id', async (req, res, next) => {
     try {
         await groupsService.deleteGroup(req.params.id);
         res.status(200).end();
+        return next();
     } catch (e) {
         return next(e);
     }
@@ -83,6 +90,7 @@ groupsRouter.post(
                 req.body.userIds
             );
             res.status(200).end();
+            return next();
         } catch (e) {
             return next(e);
         }

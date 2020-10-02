@@ -1,14 +1,18 @@
-export default (err, req, res, next) => {
+export function validationErrorHandler(err, req, res, next) {
     let error;
 
     if (err && err.error && err.error.isJoi) {
         error = err.error.toString();
-    } else if (!err.message) {
-        error = 'Something terrible wrong happened';
-    } else {
-        error = err.message;
+        console.log('validtaion error', error);
+        res.status(400).json({ error });
+        return next();
     }
 
-    res.status(400).json({ error });
+    next(err);
+}
+
+export function internalErrorHandler(err, req, res, next) {
+    console.log('internal server error', err);
+    res.status(500).json({ error: 'Internal Server Error' });
     next();
-};
+}
