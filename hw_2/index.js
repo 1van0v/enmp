@@ -5,12 +5,14 @@ import {
     validationErrorHandler,
     internalErrorHandler
 } from './utils/error_handler';
+import { timeTracker } from './utils/time_tracker';
 import { usersRouter, groupsRouter } from './controllers';
 
 const port = process.env.PORT || 3000;
 
 const app = express();
 
+app.use(timeTracker);
 app.use(express.json());
 
 app.use('/users', usersRouter);
@@ -27,9 +29,9 @@ app.listen(port, () => {
 
 process
     .on('unhandledRejection', (reason, p) => {
-        console.error(reason, 'Unhandled Rejection at Promise', p);
+        logger.error(reason, 'Unhandled Rejection at Promise', p);
     })
     .on('uncaughtException', (err) => {
-        console.error(err, 'Uncaught Exception thrown');
+        logger.error(err, 'Uncaught Exception thrown');
         process.exit(1);
     });
