@@ -2,14 +2,22 @@ import { Router } from 'express';
 
 import { groupsService } from '../services';
 import { validator } from '../configs/validator';
-import { updateGroupSchema, isBodyEmpty, addGroupSchema, addUsersToGroupSchema } from '../utils/validators';
+import {
+    updateGroupSchema,
+    isBodyEmpty,
+    addGroupSchema,
+    addUsersToGroupSchema
+} from '../utils/validators';
 
 const groupsRouter = Router();
 
 groupsRouter.get('/', (req, res, next) => {
-    console.log('processing get request');
-    groupsService.getGroups()
-        .then(users => res.json(users))
+    groupsService
+        .getGroups()
+        .then((users) => {
+            res.json(users);
+            next();
+        })
         .catch(next);
 });
 
@@ -23,19 +31,25 @@ groupsRouter.get('/:id', async (req, res, next) => {
         }
 
         res.json(group);
+        return next();
     } catch (e) {
         return next(e);
     }
 });
 
-groupsRouter.post('/', validator.body(addGroupSchema), async (req, res, next) => {
-    try {
-        const user = await groupsService.addGroup(req.body);
-        res.json(user);
-    } catch (e) {
-        return next(e);
+groupsRouter.post(
+    '/',
+    validator.body(addGroupSchema),
+    async (req, res, next) => {
+        try {
+            const user = await groupsService.addGroup(req.body);
+            res.json(user);
+            return next();
+        } catch (e) {
+            return next(e);
+        }
     }
-});
+);
 
 groupsRouter.put(
     '/:id',
@@ -48,6 +62,7 @@ groupsRouter.put(
                 req.body
             );
             res.json(updated);
+            return next();
         } catch (e) {
             return next(e);
         }
@@ -58,18 +73,27 @@ groupsRouter.delete('/:id', async (req, res, next) => {
     try {
         await groupsService.deleteGroup(req.params.id);
         res.status(200).end();
+        return next();
     } catch (e) {
         return next(e);
     }
 });
 
-groupsRouter.post('/:id/users', validator.body(addUsersToGroupSchema), async (req, res, next) => {
-    try {
-        await groupsService.addUsersToGroup(req.params.id, req.body.userIds);
-        res.status(200).end();
-    } catch (e) {
-        return next(e);
+groupsRouter.post(
+    '/:id/users',
+    validator.body(addUsersToGroupSchema),
+    async (req, res, next) => {
+        try {
+            await groupsService.addUsersToGroup(
+                req.params.id,
+                req.body.userIds
+            );
+            res.status(200).end();
+            return next();
+        } catch (e) {
+            return next(e);
+        }
     }
-});
+);
 
 export { groupsRouter };

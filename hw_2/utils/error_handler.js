@@ -1,14 +1,20 @@
-export default (err, req, res, next) => {
+import { logger } from './logger';
+
+export function validationErrorHandler(err, req, res, next) {
     let error;
 
     if (err && err.error && err.error.isJoi) {
         error = err.error.toString();
-    } else if (!err.message) {
-        error = 'Something terrible wrong happened';
-    } else {
-        error = err.message;
+        logger.error('%s', error);
+        res.status(400).json({ error });
+        return next();
     }
 
-    res.status(400).json({ error });
+    next(err);
+}
+
+export function internalErrorHandler(err, req, res, next) {
+    logger.error('internal server error %s', err);
+    res.status(500).json({ error: 'Internal Server Error' });
     next();
-};
+}

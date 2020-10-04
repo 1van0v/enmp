@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import { Op } from 'sequelize';
 
-export function UsersModel (sequelize, groupsModel) {
+export function UsersModel(sequelize, groupsModel) {
     const queryConfig = {
         include: [
             {
@@ -40,22 +40,22 @@ export function UsersModel (sequelize, groupsModel) {
         { tableName: 'users', timestamps: false }
     );
 
-
-    model.getUser = id => model.findByPk(id, queryConfig);
+    model.getUser = (id) => model.findByPk(id, queryConfig);
     model.getUsers = () => model.findAll(queryConfig);
     model.updateUser = (id, update) => model.update(update, { where: { id } });
-    model.deleteUser = id => model.updateUser(id, { isDeleted: true });
+    model.deleteUser = (id) => model.updateUser(id, { isDeleted: true });
 
-    model.getSuggestions = (str, limit) => model.findAll({
-        where: {
-            login: {
-                [Op.substring]: str
-            }
-        },
-        order: [['login', 'ASC']],
-        limit,
-        ...queryConfig
-    });
+    model.getSuggestions = (str, limit) =>
+        model.findAll({
+            where: {
+                login: {
+                    [Op.substring]: str
+                }
+            },
+            order: [['login', 'ASC']],
+            limit,
+            ...queryConfig
+        });
 
     return model;
 }

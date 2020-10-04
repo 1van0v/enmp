@@ -15,12 +15,24 @@ export const updateUserSchema = Joi.object({
 
 export const addGroupSchema = Joi.object({
     name: Joi.string().min(1).required(),
-    permissions: Joi.array().items(Joi.string().valid('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES')).required()
+    permissions: Joi.array()
+        .items(
+            Joi.string().valid(
+                'READ',
+                'WRITE',
+                'DELETE',
+                'SHARE',
+                'UPLOAD_FILES'
+            )
+        )
+        .required()
 });
 
 export const updateGroupSchema = Joi.object({
     name: Joi.string().min(1),
-    permissions: Joi.array().items(Joi.string().valid('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES'))
+    permissions: Joi.array().items(
+        Joi.string().valid('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES')
+    )
 });
 
 export const addUsersToGroupSchema = Joi.object({

@@ -14,7 +14,11 @@ const Groups = GroupsModel(sequelize);
 const Users = UsersModel(sequelize, Groups);
 const UserGroup = UserGroupModel(sequelize, Users, Groups);
 
-Users.belongsToMany(Groups, { through: UserGroup, foreignKey: 'user_id', as: 'groups' });
+Users.belongsToMany(Groups, {
+    through: UserGroup,
+    foreignKey: 'user_id',
+    as: 'groups'
+});
 Groups.belongsToMany(Users, { through: UserGroup, foreignKey: 'group_id' });
 
 export { Users, Groups, UserGroup };
