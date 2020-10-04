@@ -1,7 +1,14 @@
-export default function logger(req, res, next) {
+import { createLogger, format, transports } from 'winston';
+
+export const logger = createLogger({
+    format: format.combine(format.splat(), format.simple()),
+    transports: [new transports.Console()]
+});
+
+export function requestLogger(req, res, next) {
     const body = Object.keys(req.body).length ? req.body : '';
 
-    console.log(res.statusCode, req.method, req.path, body);
+    logger.info('%d %s %s %s', res.statusCode, req.method, req.path, body);
 
     next();
 }

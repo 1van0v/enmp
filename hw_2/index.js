@@ -1,6 +1,6 @@
 import express from 'express';
 
-import logger from './utils/logger';
+import { requestLogger, logger } from './utils/logger';
 import {
     validationErrorHandler,
     internalErrorHandler
@@ -19,10 +19,10 @@ app.use('/groups', groupsRouter);
 app.use(validationErrorHandler);
 app.use(internalErrorHandler);
 
-app.use(logger);
+app.use(requestLogger);
 
 app.listen(port, () => {
-    console.log('server is running on port', port);
+    logger.info('server is running on port %d', port);
 });
 
 process

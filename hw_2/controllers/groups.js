@@ -12,7 +12,6 @@ import {
 const groupsRouter = Router();
 
 groupsRouter.get('/', (req, res, next) => {
-    console.log('processing get request');
     groupsService
         .getGroups()
         .then((users) => {
