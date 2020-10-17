@@ -3,17 +3,20 @@ import { logger } from './logger';
 export function validationErrorHandler(err, req, res, next) {
     const isJoiError = err && err.error && err.error.isJoi;
     const isUniqueError = err.constructor.name === 'UniqueConstraintError';
-    const { isAuthError } = err;
-    const isKnownError = isJoiError || isUniqueError || isAuthError;
+    const { isAuthError, isForbiddenError } = err;
+    const isKnownError =
+        isJoiError || isUniqueError || isAuthError || isForbiddenError;
+    let status = 400;
     let error;
-    let status;
 
     if (isKnownError) {
         if (isJoiError) error = err.error.toString();
         if (isUniqueError) error = err.errors[0].message;
-        if (isAuthError) error = err.message;
+        if (isAuthError || isForbiddenError) {
+            error = err.message;
+            status = isForbiddenError ? 403 : 401;
+        }
 
-        status = isAuthError ? 401 : 400;
         logger.error('%s', error);
         res.status(status).json({ error });
         return next();

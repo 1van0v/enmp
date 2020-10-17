@@ -7,6 +7,7 @@ import {
 } from './utils/error_handler';
 import { timeTracker } from './utils/time_tracker';
 import { usersRouter, groupsRouter, loginRouter } from './controllers';
+import { tokenValidator } from './utils/token_validator';
 
 const port = process.env.PORT || 3000;
 
@@ -15,6 +16,7 @@ const app = express();
 app.use(timeTracker);
 app.use(express.json());
 app.use(requestLogger);
+app.use(tokenValidator);
 
 app.use('/login', loginRouter);
 app.use('/users', usersRouter);
