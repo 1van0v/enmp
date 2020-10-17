@@ -1,10 +1,12 @@
 import { logger } from './logger';
 
 export function validationErrorHandler(err, req, res, next) {
+    const isJoiError = err && err.error && err.error.isJoi;
+    const isUniqueError = err.constructor.name === 'UniqueConstraintError';
     let error;
 
-    if (err && err.error && err.error.isJoi) {
-        error = err.error.toString();
+    if (isJoiError || isUniqueError) {
+        error = isJoiError ? err.error.toString() : err.errors[0].message;
         logger.error('%s', error);
         res.status(400).json({ error });
         return next();
