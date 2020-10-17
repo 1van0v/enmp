@@ -58,5 +58,19 @@ export function UsersModel(sequelize, groupsModel) {
             ...queryConfig
         });
 
+    model.getAuthUser = (login, password) =>
+        model.findAll({
+            where: {
+                login: {
+                    [Op.eq]: login
+                },
+                password: {
+                    [Op.eq]: password
+                }
+            },
+            limit: 1,
+            attributes: ['id']
+        });
+
     return model;
 }

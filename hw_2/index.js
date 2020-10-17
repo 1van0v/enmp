@@ -6,7 +6,7 @@ import {
     internalErrorHandler
 } from './utils/error_handler';
 import { timeTracker } from './utils/time_tracker';
-import { usersRouter, groupsRouter } from './controllers';
+import { usersRouter, groupsRouter, loginRouter } from './controllers';
 
 const port = process.env.PORT || 3000;
 
@@ -14,14 +14,14 @@ const app = express();
 
 app.use(timeTracker);
 app.use(express.json());
+app.use(requestLogger);
 
+app.use('/login', loginRouter);
 app.use('/users', usersRouter);
 app.use('/groups', groupsRouter);
 
 app.use(validationErrorHandler);
 app.use(internalErrorHandler);
-
-app.use(requestLogger);
 
 app.listen(port, () => {
     logger.info('server is running on port %d', port);
