@@ -10,7 +10,7 @@ export const logger = createLogger({
 export function requestLogger(req, res, next) {
     const body = Object.keys(req.body).length ? req.body : '';
 
-    res.on('finish', () => {
+    res.once('finish', () => {
         logger.info(
             '%d %s %s %s %s',
             res.statusCode,

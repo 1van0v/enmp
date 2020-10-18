@@ -1,7 +1,7 @@
 export function timeTracker(req, res, next) {
     req._timestamp = process.hrtime();
 
-    res.on('finish', () => {
+    res.once('finish', () => {
         res._timestamp = process.hrtime();
         res._processingTime = process.hrtime(req._timestamp);
     });
@@ -22,6 +22,5 @@ export function getProcessingTime(res) {
         time = time.toFixed(2);
         unit = 's';
     }
-
     return time + unit;
 }

@@ -21,7 +21,8 @@ export function UsersModel(sequelize, groupsModel) {
             },
             login: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                unique: true
             },
             password: {
                 type: DataTypes.STRING,
@@ -55,6 +56,20 @@ export function UsersModel(sequelize, groupsModel) {
             order: [['login', 'ASC']],
             limit,
             ...queryConfig
+        });
+
+    model.getAuthUser = (login, password) =>
+        model.findAll({
+            where: {
+                login: {
+                    [Op.eq]: login
+                },
+                password: {
+                    [Op.eq]: password
+                }
+            },
+            limit: 1,
+            attributes: ['id']
         });
 
     return model;

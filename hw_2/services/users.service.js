@@ -1,4 +1,9 @@
+import jwt from 'jsonwebtoken';
+
 import { Users } from '../models';
+
+const secret = process.env.API_SECRET;
+const expirationTime = 60 * 60 * 60;
 
 export class UsersService {
     constructor(users) {
@@ -28,6 +33,28 @@ export class UsersService {
 
     async deleteUser(id) {
         return this.deleteUser(id);
+    }
+
+    async login(username, password) {
+        const [authUser] = await this.users.getAuthUser(username, password);
+
+        if (!authUser) {
+            throw {
+                isAuthError: true,
+                message: 'login or password is incorrect'
+            };
+        }
+
+        return new Promise((resolve, reject) => {
+            jwt.sign(
+                { id: authUser.id },
+                secret,
+                { expiresIn: expirationTime },
+                (error, token) => {
+                    return error ? reject(error) : resolve(token);
+                }
+            );
+        });
     }
 }
 

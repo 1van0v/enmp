@@ -1,1 +1,2 @@
 DATABASE_URL='connection_string'
+API_SECRET='secret_string'

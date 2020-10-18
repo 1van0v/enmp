@@ -16,7 +16,7 @@ pg.connect();
         await pg.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
         await pg.query(`CREATE TABLE users (
             id UUID DEFAULT uuid_generate_v4 (),
-            login VARCHAR NOT NULL,
+            login VARCHAR UNIQUE NOT NULL,
             password VARCHAR NOT NULL,
             age NUMERIC(3) NOT NULL,
             "isDeleted" BOOLEAN NOT NULL DEFAULT false,
