@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 import { requestLogger, logger } from './utils/logger';
 import {
@@ -14,6 +15,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(timeTracker);
+app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 app.use(tokenValidator);
