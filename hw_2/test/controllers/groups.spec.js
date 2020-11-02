@@ -45,7 +45,7 @@ describe('Groups Controller', () => {
             });
     });
 
-    describe('add user', () => {
+    describe('add group', () => {
         beforeEach(() => {
             groupsService.addGroup = jest.fn();
         });
@@ -67,11 +67,11 @@ describe('Groups Controller', () => {
         });
 
         test('It should not call addGroup method for empty body', (done) => {
-            const userToUpdate = {};
+            const groupToUpdate = {};
 
             request(testApp)
                 .put('/1')
-                .send(userToUpdate)
+                .send(groupToUpdate)
                 .then((res) => {
                     expect(res.statusCode).toBe(500);
                     expect(groupsService.addGroup).not.toHaveBeenCalled();
@@ -80,11 +80,11 @@ describe('Groups Controller', () => {
         });
 
         test('It should not call addGroup method if name has less than 1 character', (done) => {
-            const userToUpdate = { name: '' };
+            const groupToUpdate = { name: '' };
 
             request(testApp)
                 .put('/1')
-                .send(userToUpdate)
+                .send(groupToUpdate)
                 .then((res) => {
                     expect(res.statusCode).toBe(500);
                     expect(groupsService.addGroup).not.toHaveBeenCalled();
@@ -93,11 +93,11 @@ describe('Groups Controller', () => {
         });
 
         test('It should not call addGroup method if permissions have invalid permission', (done) => {
-            const userToUpdate = { permissions: ['invalid'] };
+            const groupToUpdate = { permissions: ['invalid'] };
 
             request(testApp)
                 .put('/1')
-                .send(userToUpdate)
+                .send(groupToUpdate)
                 .then((res) => {
                     expect(res.statusCode).toBe(500);
                     expect(groupsService.addGroup).not.toHaveBeenCalled();
@@ -106,12 +106,12 @@ describe('Groups Controller', () => {
         });
     });
 
-    describe('update user', () => {
+    describe('update group', () => {
         beforeEach(() => {
             groupsService.updateGroup = jest.fn();
         });
 
-        test('It should return updated user', (done) => {
+        test('It should return updated group', (done) => {
             const groupToUpdate = { name: 'test', permissions: ['WRITE'] };
             const updatedGroup = { id: 1, ...groupToUpdate };
             groupsService.updateGroup.mockReturnValue(
@@ -174,7 +174,7 @@ describe('Groups Controller', () => {
             groupsService.deleteGroup = jest.fn();
         });
 
-        test('it should return deleted user', (done) => {
+        test('it should return deleted group', (done) => {
             groupsService.deleteGroup.mockReturnValue();
 
             request(testApp)
@@ -182,6 +182,46 @@ describe('Groups Controller', () => {
                 .then((res) => {
                     expect(res.statusCode).toBe(200);
                     expect(groupsService.deleteGroup).toHaveBeenCalledWith('1');
+                    done();
+                });
+        });
+    });
+
+    describe('add users to group', () => {
+        beforeEach(() => {
+            groupsService.addUsersToGroup = jest.fn();
+        });
+
+        test('it should return 200 when users were added', (done) => {
+            const userIds = [2];
+            request(testApp)
+                .post('/1/users')
+                .send({ userIds })
+                .then((res) => {
+                    expect(res.statusCode).toBe(200);
+                    expect(groupsService.addUsersToGroup).toHaveBeenCalledWith(
+                        '1',
+                        userIds
+                    );
+                    done();
+                });
+        });
+
+        test('it should return 500 when addUsersToGroup throws error', (done) => {
+            const userIds = [3];
+            groupsService.addUsersToGroup.mockRejectedValue(
+                new Error('test error')
+            );
+
+            request(testApp)
+                .post('/4/users')
+                .send({ userIds })
+                .then((res) => {
+                    expect(res.statusCode).toBe(500);
+                    expect(groupsService.addUsersToGroup).toHaveBeenCalledWith(
+                        '4',
+                        userIds
+                    );
                     done();
                 });
         });

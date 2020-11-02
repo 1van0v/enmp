@@ -45,6 +45,38 @@ describe('Users Controller', () => {
             });
     });
 
+    describe('get user', () => {
+        beforeEach(() => {
+            usersService.getUser = jest.fn();
+        });
+
+        test('It should return the user details', (done) => {
+            const testUser = { name: 'testUser' };
+            usersService.getUser.mockReturnValue(Promise.resolve(testUser));
+
+            request(testApp)
+                .get('/1')
+                .then((res) => {
+                    expect(res.statusCode).toBe(200);
+                    expect(usersService.getUser).toHaveBeenCalledWith('1');
+                    expect(res.body).toEqual(testUser);
+                    done();
+                });
+        });
+
+        test('It should return error if there is no user with requested id', (done) => {
+            usersService.getUser.mockReturnValue(Promise.resolve(null));
+
+            request(testApp)
+                .get('/1')
+                .then((res) => {
+                    expect(res.statusCode).toBe(500);
+                    expect(usersService.getUser).toHaveBeenCalledWith('1');
+                    done();
+                });
+        });
+    });
+
     describe('add user', () => {
         beforeEach(() => {
             usersService.addUser = jest.fn();
