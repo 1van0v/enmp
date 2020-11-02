@@ -14,8 +14,8 @@ const groupsRouter = Router();
 groupsRouter.get('/', (req, res, next) => {
     groupsService
         .getGroups()
-        .then((users) => {
-            res.json(users);
+        .then((groups) => {
+            res.json(groups);
             next();
         })
         .catch(next);
