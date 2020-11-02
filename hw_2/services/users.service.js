@@ -32,7 +32,8 @@ export class UsersService {
     }
 
     async deleteUser(id) {
-        return this.deleteUser(id);
+        await this.users.deleteUser(id);
+        return this.getUser(id);
     }
 
     async login(username, password) {
